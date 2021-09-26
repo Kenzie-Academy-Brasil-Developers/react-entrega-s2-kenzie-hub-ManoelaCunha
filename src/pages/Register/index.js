@@ -1,9 +1,9 @@
 import FormRegister from "../../components/FormRegister";
 
-const Register = () => {
+const Register = ({ authenticated, userId }) => {
   return (
     <div>
-      <FormRegister />
+      <FormRegister userId={userId} authenticated={authenticated} />
     </div>
   );
 };
