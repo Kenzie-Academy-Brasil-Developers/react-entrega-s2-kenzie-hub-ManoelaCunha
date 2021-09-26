@@ -1,27 +1,99 @@
+import img from "./undraw_to_the_stars.svg";
+import avatar from "./avatar-outline.gif";
+
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 //import { useStyles } from "./styles";
-import { Button, TextField } from "@material-ui/core";
-//import { Visibility, VisibilityOff, Person, Email } from "@material-ui/icons";
+import { makeStyles } from "@material-ui/core/styles";
+import {
+  Button,
+  TextField,
+  Typography,
+  Paper,
+  List,
+  ListItem,
+} from "@material-ui/core";
 
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { Redirect, useHistory, useParams } from "react-router";
 
+export const useStyles = makeStyles(() => ({
+  root: {
+    margin: 0,
+    padding: 0,
+  },
+  box: {
+    height: "65px",
+  },
+  card: {
+    width: 310,
+    margin: "0px auto",
+    ["@media (min-width:780px)"]: {
+      width: 350,
+    },
+  },
+  list: {
+    fontSize: "22px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  form: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexWrap: "wrap",
+  },
+  title: {
+    margin: "20px",
+    fontSize: "36px",
+  },
+  subTitle: {
+    fontSize: "28px",
+  },
+  textfield: {
+    margin: "5px",
+    minWidth: 100,
+  },
+  button: {
+    margin: "5px",
+    fontSize: "15px",
+  },
+  icone: {
+    fontSize: "20px",
+    cursor: "pointer",
+    color: "rgb(40,40,190)",
+  },
+  avatar: {
+    borderRadius: "100%",
+    width: 100,
+    height: 100,
+    backgroundColor: "white",
+  },
+  boxUser: {
+    width: 310,
+    margin: "20px auto",
+    display: "flex",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+  },
+}));
+
 const Home = ({ authenticated, setAuthenticated, setUserId }) => {
   const history = useHistory();
+  const classes = useStyles();
   const params = useParams();
 
   const [name, setName] = useState("");
   const [techs, setTechs] = useState([]);
   const [newTech, setNewTech] = useState([]);
-  console.log(newTech);
 
   const formSchema = yup.object().shape({
-    title: yup.string().required("Bio obrigatório"),
-    status: yup.string().required("Número obrigatório"),
+    title: yup.string().required("Nome da Tecnologia obrigatório"),
+    status: yup.string().required("Nível obrigatório"),
   });
 
   const {
@@ -31,14 +103,13 @@ const Home = ({ authenticated, setAuthenticated, setUserId }) => {
   } = useForm({ resolver: yupResolver(formSchema) });
 
   const [token] = useState(
-    JSON.parse(localStorage.getItem("@KenzieHub:token")) || ""
+    JSON.parse(window.localStorage.getItem("@KenzieHub:token")) || ""
   );
 
   const loadUser = () => {
     axios
       .get(`https://kenziehub.herokuapp.com/users/${params.id}`)
       .then((response) => {
-        console.log(response);
         setTechs(response.data.techs);
         setName(response.data.name);
       })
@@ -50,13 +121,12 @@ const Home = ({ authenticated, setAuthenticated, setUserId }) => {
     setUserId(params.id);
   }, [newTech]);
 
-  const handleNewTech = (data) => {
+  const handleAddTech = (data) => {
     axios
       .post("https://kenziehub.herokuapp.com/users/techs", data, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
-        console.log(response.data);
         setNewTech([...newTech, response.data]);
       })
       .catch((err) => console.log(err.response));
@@ -74,80 +144,96 @@ const Home = ({ authenticated, setAuthenticated, setUserId }) => {
       });
   };
 
-  /*if (!authenticated) {
-    return <Redirect to="/" />;
-  }*/
-
   return (
-    <div>
-      <h1>Perfil Usuário</h1>
-      <p>{name}</p>
+    <div className={classes.root}>
+      <div className={classes.boxUser}>
+        <img className={classes.avatar} src={avatar} alt="Avatar" />
 
-      <form onSubmit={handleSubmit(handleNewTech)}>
         <div>
+          <Typography variant="h4" className={classes.subTitle}>
+            {name}
+          </Typography>
+
+          <Button
+            size="small"
+            color="primary"
+            variant="contained"
+            className={classes.button}
+            onClick={() => {
+              window.localStorage.clear();
+              setAuthenticated(false);
+              history.push("/");
+            }}
+          >
+            Logout
+          </Button>
+        </div>
+      </div>
+
+      <Typography variant="h3" className={classes.title}>
+        TECNOLOGIAS
+      </Typography>
+
+      <form className={classes.form} onSubmit={handleSubmit(handleAddTech)}>
+        <div className={classes.box}>
           <TextField
             type="text"
             size="small"
-            label="Nome da Tecnologia"
-            margin="normal"
-            variant="filled"
+            label="Tecnologia"
+            /*margin="normal"*/
+            variant="outlined"
             {...register("title")}
             error={!!errors.title}
             helperText={errors.title?.message}
-            //className={classes.textfield}
-            /*InputProps={{
-            endAdornment: <Person className={classes.icone} />,
-            }}*/
+            className={classes.textfield}
           />
         </div>
-        <div>
+        <div className={classes.box}>
           <TextField
             type="text"
             size="small"
             label="Nível"
-            margin="normal"
-            variant="filled"
+            /*margin="normal"*/
+            variant="outlined"
             {...register("status")}
             error={!!errors.status}
             helperText={errors.status?.message}
-            //className={classes.textfield}
-            /*InputProps={{
-            endAdornment: <Person className={classes.icone} />,
-            }}*/
+            className={classes.textfield}
           />
         </div>
-        <div>
+        <div className={classes.box}>
           <Button
             type="submit"
-            size="large"
+            size="medium"
             color="primary"
-            variant="outlined"
-            //className={classes.button}
+            variant="contained"
+            className={classes.button}
           >
             Cadastrar
           </Button>
         </div>
       </form>
+
+      <img src={img} alt="astronauta" width="300" height="300" />
+
       <div>
-        <ul>
-          {techs.map((item) => (
-            <li key={item.id}>
-              {item.title} {item.status}{" "}
-              <button onClick={() => handleReset(item.id)}>excluir</button>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div>
-        <Button
-          onClick={() => {
-            window.localStorage.clear();
-            setAuthenticated(false);
-            history.push("/");
-          }}
-        >
-          Sair
-        </Button>
+        <Paper className={classes.card}>
+          <List>
+            {techs.map((item) => (
+              <ListItem key={item.id} className={classes.list}>
+                {`${item.title} - ${item.status}`}
+                <Button
+                  size="small"
+                  color="primary"
+                  variant="outlined"
+                  onClick={() => handleReset(item.id)}
+                >
+                  Excluir
+                </Button>
+              </ListItem>
+            ))}
+          </List>
+        </Paper>
       </div>
       {!authenticated && <Redirect to="/" />}
     </div>

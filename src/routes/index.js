@@ -10,7 +10,7 @@ const Routes = () => {
   const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("@KenzieHub:token");
+    const token = window.localStorage.getItem("@KenzieHub:token");
     token && setAuthenticated(true);
   }, [authenticated]);
 
