@@ -2,8 +2,7 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-//import { useStyles } from "./styles";
-import { makeStyles } from "@material-ui/core/styles";
+import { useStyles } from "../../styles/stylesForm";
 import { Button, TextField, Paper, Typography } from "@material-ui/core";
 import {
   VisibilityOutlined,
@@ -15,40 +14,7 @@ import { Redirect, useHistory, Link } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
 
-export const useStyles = makeStyles(() => ({
-  root: {
-    margin: 0,
-    padding: 0,
-    textDecoration: 0,
-  },
-  box: {
-    margin: "0px 20px",
-    padding: "20px",
-    backgroundColor: "white",
-  },
-  title: {
-    margin: "20px",
-    fontSize: "36px",
-  },
-  subTitle: {
-    margin: "20px",
-    fontSize: "20px",
-  },
-  textfield: {
-    minWidth: 250,
-    ["@media (min-width:780px)"]: {
-      width: 320,
-    },
-  },
-  button: {
-    margin: "20px 0px",
-  },
-  icone: {
-    fontSize: "20px",
-    cursor: "pointer",
-    color: "rgb(40,40,190)",
-  },
-}));
+import { toast } from "react-toastify";
 
 const FormLogin = ({ authenticated, setAuthenticated, userId }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -80,7 +46,7 @@ const FormLogin = ({ authenticated, setAuthenticated, userId }) => {
     formState: { errors },
   } = useForm({ resolver: yupResolver(formSchema) });
 
-  const handleForm = (data) => {
+  const handleFormLogin = (data) => {
     axios
       .post("https://kenziehub.herokuapp.com/sessions", data)
       .then((response) => {
@@ -90,18 +56,21 @@ const FormLogin = ({ authenticated, setAuthenticated, userId }) => {
           JSON.stringify(response.data.token)
         );
         setAuthenticated(true);
-        history.push(`/home/${response.data.user.id}`);
+        toast.success("Sucesso ao fazer Login!");
+        return history.push(`/home/${response.data.user.id}`);
       })
-      .catch((err) => console.log(err));
+      .catch((_) => {
+        toast.error("Erro ao fazer Login, Email ou Senha incorretos!");
+      });
   };
 
   return (
     <div className={classes.root}>
-      <Typography variant="h3" className={classes.title}>
-        LOGIN
-      </Typography>
       <Paper elevation={3} className={classes.box}>
-        <form onSubmit={handleSubmit(handleForm)}>
+        <Typography variant="h3" className={classes.title}>
+          LOGIN
+        </Typography>
+        <form onSubmit={handleSubmit(handleFormLogin)}>
           <div>
             <TextField
               type="email"
@@ -159,7 +128,11 @@ const FormLogin = ({ authenticated, setAuthenticated, userId }) => {
       </Paper>
       <div>
         <Typography variant="h5" className={classes.subTitle}>
-          Não tem uma conta? Faça o <Link to="/register">Cadastro</Link>!
+          Não tem uma conta? Faça o{" "}
+          <Link className={classes.link} to="/register">
+            Cadastro
+          </Link>
+          !
         </Typography>
       </div>
       {authenticated && <Redirect to={`/home/${userId}`} />}

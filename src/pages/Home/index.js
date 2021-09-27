@@ -1,12 +1,11 @@
-import img from "./undraw_to_the_stars.svg";
-import avatar from "./avatar-outline.gif";
+import img from "../../assets/undraw_to_the_stars.svg";
+import avatar from "../../assets/avatar-outline.gif";
 
 import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-//import { useStyles } from "./styles";
-import { makeStyles } from "@material-ui/core/styles";
+import { useStyles } from "../../styles/stylesHome";
 import {
   Button,
   TextField,
@@ -20,67 +19,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { Redirect, useHistory, useParams } from "react-router";
 
-export const useStyles = makeStyles(() => ({
-  root: {
-    margin: 0,
-    padding: 0,
-  },
-  box: {
-    height: "65px",
-  },
-  card: {
-    width: 310,
-    margin: "0px auto",
-    ["@media (min-width:780px)"]: {
-      width: 350,
-    },
-  },
-  list: {
-    fontSize: "22px",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  form: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    flexWrap: "wrap",
-  },
-  title: {
-    margin: "20px",
-    fontSize: "36px",
-  },
-  subTitle: {
-    fontSize: "28px",
-  },
-  textfield: {
-    margin: "5px",
-    minWidth: 100,
-  },
-  button: {
-    margin: "5px",
-    fontSize: "15px",
-  },
-  icone: {
-    fontSize: "20px",
-    cursor: "pointer",
-    color: "rgb(40,40,190)",
-  },
-  avatar: {
-    borderRadius: "100%",
-    width: 100,
-    height: 100,
-    backgroundColor: "white",
-  },
-  boxUser: {
-    width: 310,
-    margin: "20px auto",
-    display: "flex",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-  },
-}));
+import { toast } from "react-toastify";
 
 const Home = ({ authenticated, setAuthenticated, setUserId }) => {
   const history = useHistory();
@@ -97,6 +36,7 @@ const Home = ({ authenticated, setAuthenticated, setUserId }) => {
   });
 
   const {
+    reset,
     register,
     handleSubmit,
     formState: { errors },
@@ -112,115 +52,131 @@ const Home = ({ authenticated, setAuthenticated, setUserId }) => {
       .then((response) => {
         setTechs(response.data.techs);
         setName(response.data.name);
-      })
-      .catch((err) => console.log(err));
+      });
   };
 
   useEffect(() => {
     loadUser();
     setUserId(params.id);
-  }, [newTech]);
+  }, [params.id, newTech]);
 
   const handleAddTech = (data) => {
-    axios
+    const addTech = axios
       .post("https://kenziehub.herokuapp.com/users/techs", data, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
+        toast.success("Tecnologia adicionada!");
         setNewTech([...newTech, response.data]);
       })
-      .catch((err) => console.log(err.response));
+      .catch((_) => {
+        toast.error("Tecnologia já foi adicionada!");
+      });
+    reset(addTech);
   };
 
   const handleReset = (id) => {
     const resetTech = newTech.filter((item) => item.id !== id);
-
     axios
       .delete(`https://kenziehub.herokuapp.com/users/techs/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((response) => {
+      .then((_) => {
         setNewTech(resetTech);
       });
   };
 
   return (
     <div className={classes.root}>
-      <div className={classes.boxUser}>
-        <img className={classes.avatar} src={avatar} alt="Avatar" />
+      <div className={classes.box}>
+        <div>
+          <div className={classes.boxUser}>
+            <div>
+              <img className={classes.avatar} src={avatar} alt="Avatar" />
+            </div>
+
+            <div>
+              <Typography variant="h4" style={{ fontSize: "26px" }}>
+                {name}
+              </Typography>
+
+              <Button
+                size="small"
+                color="primary"
+                variant="contained"
+                className={classes.button}
+                onClick={() => {
+                  window.localStorage.clear();
+
+                  setAuthenticated(false);
+                  history.push("/");
+                }}
+              >
+                Logout
+              </Button>
+            </div>
+          </div>
+
+          <Typography variant="h4" style={{ color: "darkcyan" }}>
+            TECNOLOGIAS
+          </Typography>
+        </div>
 
         <div>
-          <Typography variant="h4" className={classes.subTitle}>
-            {name}
-          </Typography>
-
-          <Button
-            size="small"
-            color="primary"
-            variant="contained"
-            className={classes.button}
-            onClick={() => {
-              window.localStorage.clear();
-              setAuthenticated(false);
-              history.push("/");
-            }}
-          >
-            Logout
-          </Button>
+          <img src={img} alt="foguete" width="300" height="300" />
         </div>
       </div>
 
-      <Typography variant="h3" className={classes.title}>
-        TECNOLOGIAS
-      </Typography>
-
-      <form className={classes.form} onSubmit={handleSubmit(handleAddTech)}>
-        <div className={classes.box}>
+      <form className={classes.box} onSubmit={handleSubmit(handleAddTech)}>
+        <div className={classes.boxForm}>
           <TextField
             type="text"
             size="small"
             label="Tecnologia"
-            /*margin="normal"*/
             variant="outlined"
             {...register("title")}
             error={!!errors.title}
             helperText={errors.title?.message}
-            className={classes.textfield}
+            style={{ margin: "5px" }}
           />
         </div>
-        <div className={classes.box}>
+        <div className={classes.boxForm}>
           <TextField
             type="text"
             size="small"
             label="Nível"
-            /*margin="normal"*/
             variant="outlined"
             {...register("status")}
             error={!!errors.status}
             helperText={errors.status?.message}
-            className={classes.textfield}
+            style={{ margin: "5px" }}
           />
         </div>
-        <div className={classes.box}>
+        <div className={classes.boxForm}>
           <Button
             type="submit"
             size="medium"
             color="primary"
             variant="contained"
-            className={classes.button}
+            style={{ margin: "5px", fontSize: "15px" }}
           >
             Cadastrar
           </Button>
         </div>
       </form>
 
-      <img src={img} alt="astronauta" width="300" height="300" />
-
       <div>
         <Paper className={classes.card}>
-          <List>
+          <List style={{ margin: 0, padding: 0 }}>
             {techs.map((item) => (
-              <ListItem key={item.id} className={classes.list}>
+              <ListItem
+                key={item.id}
+                style={{
+                  justifyContent: "space-between",
+                  padding: "8px",
+                  fontSize: "22px",
+                }}
+              >
                 {`${item.title} - ${item.status}`}
                 <Button
                   size="small"

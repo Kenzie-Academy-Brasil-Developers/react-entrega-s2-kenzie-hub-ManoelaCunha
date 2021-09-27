@@ -1,5 +1,8 @@
-.App {
-  background-color: ghostwhite;
+.App-header {
+  margin-left: 20px;
+}
+
+.App-content {
   min-height: 100vh;
   text-align: center;
   display: flex;
@@ -8,4 +11,5 @@
   justify-content: flex-start;
   font-size: calc(10px + 2vmin);
   color: black;
+  background-color: ghostwhite;
 }
