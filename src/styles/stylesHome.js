@@ -12,7 +12,7 @@ export const useStyles = makeStyles(() => ({
     justifyContent: "center",
   },
   boxUser: {
-    width: 320,
+    width: 310,
     margin: "28px auto",
     display: "flex",
     alignItems: "center",
@@ -26,7 +26,7 @@ export const useStyles = makeStyles(() => ({
     margin: "0px auto",
     marginBottom: "30px",
     "@media (min-width:780px)": {
-      width: 350,
+      width: 360,
     },
   },
   icone: {

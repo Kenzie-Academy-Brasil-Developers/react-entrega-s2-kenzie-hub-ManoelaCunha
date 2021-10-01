@@ -172,9 +172,10 @@ const Home = ({ authenticated, setAuthenticated, setUserId }) => {
               <ListItem
                 key={item.id}
                 style={{
-                  justifyContent: "space-between",
                   padding: "8px",
                   fontSize: "22px",
+                  wordBreak: "break-word",
+                  justifyContent: "space-between",
                 }}
               >
                 {`${item.title} - ${item.status}`}
@@ -182,6 +183,7 @@ const Home = ({ authenticated, setAuthenticated, setUserId }) => {
                   size="small"
                   color="primary"
                   variant="outlined"
+                  style={{ fontSize: "10px" }}
                   onClick={() => handleReset(item.id)}
                 >
                   Excluir
